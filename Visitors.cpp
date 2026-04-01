@@ -1,16 +1,12 @@
 #include "Visitors.h"
 #include <iostream>
+#include <utility>
 
 using namespace std;
 
 int Visitors::visitorCount = 0;
 
-Visitors::Visitors() {
-    name = "None";
-    age = 0;
-    ticket = 0;
-    visitorCount++;
-}
+Visitors::Visitors() : Visitors("None", 0, 0) {}
 
 Visitors::Visitors(string name, int age, int ticket) {
     this->name = name;
@@ -26,10 +22,19 @@ Visitors::Visitors(const Visitors& other) {
     visitorCount++;
 }
 
-Visitors::Visitors(Visitors&& other) {
+Visitors::Visitors(Visitors&& other) noexcept {
     name = move(other.name);
     age = other.age;
     ticket = other.ticket;
+}
+
+Visitors& Visitors::operator=(const Visitors& other) {
+    if (this != &other) {
+        name = other.name;
+        age = other.age;
+        ticket = other.ticket;
+    }
+    return *this;
 }
 
 Visitors::~Visitors() {
@@ -49,11 +54,7 @@ int Visitors::getCount() {
 }
 
 Visitors Visitors::operator+(const Visitors& other) {
-    Visitors temp;
-    temp.name = this->name + " + " + other.name;
-    temp.age = this->age + other.age;
-    temp.ticket = this->ticket + other.ticket;
-    return temp;
+    return Visitors(this->name + " + " + other.name, this->age + other.age, this->ticket + other.ticket);
 }
 
 ostream& operator<<(ostream& os, const Visitors& v) {
@@ -64,4 +65,13 @@ ostream& operator<<(ostream& os, const Visitors& v) {
 istream& operator>>(istream& is, Visitors& v) {
     is >> v.name >> v.age >> v.ticket;
     return is;
+}
+
+VIPVisitor::VIPVisitor(string name, int age, int ticket, string lounge)
+    : Visitors(name, age, ticket), loungeAccess(lounge) {
+}
+
+void VIPVisitor::display() const {
+    Visitors::display();
+    cout << "Lounge Access: " << loungeAccess << endl;
 }
