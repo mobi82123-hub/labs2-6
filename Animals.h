@@ -2,23 +2,36 @@
 #define ANIMALS_H
 
 #include <string>
+#include <iostream>
+
 using namespace std;
 
 class Animals {
-private:
-	string species;
-	int weight;
-	int age;
+protected:
+    string species;
+    int weight;
+    int age;
 
 public:
-	Animals();
-	Animals(string species, int age, int weight);
+    Animals();
+    Animals(string species, int age, int weight);
 
-	~Animals();
+    Animals(const Animals& other);
+    Animals& operator=(const Animals& other);
 
-	
-	void display() const;
+    virtual ~Animals();
 
+    virtual void display() const;
+};
+
+class Mammal : public Animals {
+private:
+    string furColor;
+
+public:
+    Mammal(string species, int age, int weight, string furColor);
+
+    void display() const override;
 };
 
 #endif
