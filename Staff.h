@@ -2,23 +2,36 @@
 #define STAFF_H
 
 #include <string>
+#include <iostream>
+
 using namespace std;
 
 class Staff {
-private:
-	string name;
-	string position;
-	int age;
+protected:
+    string name;
+    string position;
+    int age;
 
 public:
-	Staff();
-	Staff(string name, string position, int age);
+    Staff();
+    Staff(string name, string position, int age);
 
-	~Staff();
+    Staff(const Staff& other);
+    Staff& operator=(const Staff& other);
 
-	// ВИПРАВЛЕНО: було 'conts', має бути 'const'
-	void display() const;
+    virtual ~Staff();
 
+    virtual void display() const;
+};
+
+class Manager : public Staff {
+private:
+    int teamSize;
+
+public:
+    Manager(string name, string position, int age, int teamSize);
+
+    void display() const override;
 };
 
 #endif
