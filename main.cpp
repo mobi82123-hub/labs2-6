@@ -1,5 +1,6 @@
 #include <iostream>
 #include <utility>
+#include <vector>
 #include "Visitors.h"
 #include "Animals.h"
 #include "Staff.h"
@@ -7,38 +8,47 @@
 using namespace std;
 
 int main() {
-    Visitors v1;
-    Visitors v2("Victor", 69, 81);
-    VIPVisitor vip1("Oleg", 25, 999, "Business Lounge");
+    cout << "--- 1. Static Method Binding Demo ---" << endl;
+    Staff realStaff("Ivan", "Guard", 35);
+    Staff* staffPtr = &realStaff;
+    staffPtr->info();
 
-    cout << "--- Visitors ---" << endl;
-    v1.display();
-    v2.display();
-    vip1.display();
+    cout << "\n--- 2. Base Class Pointer Polimorphism ---" << endl; // через вказівник
+    Manager boss("Alice", "Director", 45, 10);
+    Person* p1 = &boss;
+    p1->display();
+    cout << "Role: " << p1->getRole() << endl;
 
-    Visitors v3 = v2;
-    Visitors v4 = move(v3);
-    Visitors v5 = v1 + v2;
+    cout << "\n--- 3. Base Class Reference Polimorphism ---" << endl; // через посилання
+    Mammal lion("Lion", 5, &realStaff, "Golden");
+    Animals& animalRef = lion;
+    animalRef.display();
 
-    cout << "\nTotal: " << Visitors::getCount() << endl;
+    cout << "\n--- 4. Interface (IPrintable) Demo ---" << endl;
+    IPrintable* widgets[2];
+    widgets[0] = &boss;
+    widgets[1] = &lion;
 
-    Animals a1;
-    Animals a2("Panthera leo", 12, 150);
-    Mammal m1("Lion", 5, 190, "Golden");
+    for (int i = 0; i < 2; i++) {
+        widgets[i]->printStatus();
+    }
 
-    cout << "\n--- Animals ---" << endl;
-    a1.display();
-    a2.display();
-    m1.display();
+    cout << "\n--- 5. Pure Virtual Functions Result ---" << endl;
+    VIPVisitor vip1("Oleg", 25, 999, "Business Lounge", &lion);
+    cout << "Visitor Role: " << vip1.getRole() << endl;
+    cout << "Animal Sound: " << lion.getSound() << endl;
 
-    Staff st1;
-    Staff st2("Vasya", "cleaner", 69);
-    Manager man1("Alice", "Project Manager", 30, 15);
+    cout << "\n--- 6. Copy & Move Logic ---" << endl;
+    Visitors v1("Victor", 69, 81, &lion);
+    Visitors v2 = v1;
+    Visitors v3 = move(v2);
 
-    cout << "\n--- Staff ---" << endl;
-    st1.display();
-    st2.display();
-    man1.display();
+    cout << "Active Visitors: " << Visitors::getCount() << endl;
 
+    cout << "\n--- 7. Virtual Destructor Demo ---" << endl;
+    Person* polyPerson = new Staff("Temp", "Worker", 20);
+    delete polyPerson;
+
+    cout << "\n--- End of Program ---" << endl;
     return 0;
 }
