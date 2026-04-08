@@ -1,17 +1,15 @@
 #include "Staff.h"
-#include <iostream>
-#include <utility>
 
-using namespace std;
+Staff::Staff() : Person(), position("None"), age(0) {}
 
-Staff::Staff() : Staff("Vasya", "cleaner", 69) {}
-
-Staff::Staff(string name, string position, int age)
-    : name(name), position(position), age(age) {
+Staff::Staff(std::string name, std::string position, int age)
+    : Person(name), position(position), age(age) {
 }
 
-Staff::Staff(const Staff& other)
-    : name(other.name), position(other.position), age(other.age) {
+Staff::Staff(const Staff& other) : Person(other.name), position(other.position), age(other.age) {}
+
+Staff::Staff(Staff&& other) noexcept : Person(std::move(other.name)), position(std::move(other.position)), age(other.age) {
+    other.age = 0;
 }
 
 Staff& Staff::operator=(const Staff& other) {
@@ -23,21 +21,34 @@ Staff& Staff::operator=(const Staff& other) {
     return *this;
 }
 
-Staff::~Staff() {
-    cout << "Staff destroyed" << endl;
-}
+Staff::~Staff() {}
 
 void Staff::display() const {
-    cout << "Name: " << name
-        << ", Position: " << position
-        << ", Age: " << age << endl;
+    std::cout << "[" << getRole() << "] ";
+    Person::display();
+    std::cout << "Position: " << position << ", Age: " << age << std::endl;
 }
 
-Manager::Manager(string name, string position, int age, int teamSize)
+std::ostream& operator<<(std::ostream& os, const Staff& s) {
+    os << "Staff: " << s.name << " (" << s.position << ")";
+    return os;
+}
+
+std::istream& operator>>(std::istream& is, Staff& s) {
+    std::cout << "Enter name: ";
+    is >> s.name;
+    std::cout << "Enter position: ";
+    is >> s.position;
+    std::cout << "Enter age: ";
+    is >> s.age;
+    return is;
+}
+
+Manager::Manager(std::string name, std::string position, int age, int teamSize)
     : Staff(name, position, age), teamSize(teamSize) {
 }
 
 void Manager::display() const {
     Staff::display();
-    cout << "Team Size: " << teamSize << endl;
+    std::cout << "Team Size: " << teamSize << std::endl;
 }
