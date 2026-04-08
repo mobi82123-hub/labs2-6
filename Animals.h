@@ -1,37 +1,41 @@
 #ifndef ANIMALS_H
 #define ANIMALS_H
-
 #include <string>
-#include <iostream>
+#include "Staff.h"
 
-using namespace std;
-
-class Animals {
+class Animals : public IPrintable {
 protected:
-    string species;
-    int weight;
+    std::string species;
     int age;
+    Staff* caretaker;
 
 public:
     Animals();
-    Animals(string species, int age, int weight);
+    Animals(std::string species, int age, Staff* caretaker = nullptr);
 
     Animals(const Animals& other);
     Animals& operator=(const Animals& other);
 
+    Animals(Animals&& other) noexcept;
+    Animals& operator=(Animals&& other) noexcept;
+
     virtual ~Animals();
 
     virtual void display() const;
+
+    virtual std::string getSound() const = 0;
+
+    void printStatus() const override { std::cout << "Animal status: Healthy" << std::endl; }
 };
 
-class Mammal : public Animals {
+class Mammal final : public Animals {
 private:
-    string furColor;
-
+    std::string furColor;
 public:
-    Mammal(string species, int age, int weight, string furColor);
-
+    Mammal(std::string species, int age, Staff* caretaker, std::string furColor);
     void display() const override;
+
+    std::string getSound() const override { return "Mammal sound"; }
 };
 
 #endif
