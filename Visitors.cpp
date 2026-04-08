@@ -1,31 +1,33 @@
 #include "Visitors.h"
-#include <iostream>
-#include <utility>
-
-using namespace std;
 
 int Visitors::visitorCount = 0;
 
-Visitors::Visitors() : Visitors("None", 0, 0) {}
-
-Visitors::Visitors(string name, int age, int ticket) {
-    this->name = name;
-    this->age = age;
-    this->ticket = ticket;
+Visitors::Visitors() : Person("Unknown"), age(0), ticket(0), favoriteAnimal(nullptr) {
     visitorCount++;
 }
 
-Visitors::Visitors(const Visitors& other) {
-    name = other.name;
-    age = other.age;
-    ticket = other.ticket;
+Visitors::Visitors(std::string name, int age, int ticket, Animals* fav)
+    : Person(name), age(age), ticket(ticket) {
+    if (fav) {
+        this->favoriteAnimal = fav;
+    }
+    else {
+        this->favoriteAnimal = nullptr;
+    }
     visitorCount++;
 }
 
-Visitors::Visitors(Visitors&& other) noexcept {
-    name = move(other.name);
-    age = other.age;
-    ticket = other.ticket;
+Visitors::Visitors(const Visitors& other)
+    : Person(other.name), age(other.age), ticket(other.ticket) {
+    this->favoriteAnimal = other.favoriteAnimal;
+    visitorCount++;
+}
+
+Visitors::Visitors(Visitors&& other) noexcept
+    : Person(std::move(other.name)), age(other.age), ticket(other.ticket), favoriteAnimal(other.favoriteAnimal) {
+    other.favoriteAnimal = nullptr;
+    other.age = 0;
+    other.ticket = 0;
 }
 
 Visitors& Visitors::operator=(const Visitors& other) {
@@ -33,6 +35,7 @@ Visitors& Visitors::operator=(const Visitors& other) {
         name = other.name;
         age = other.age;
         ticket = other.ticket;
+        favoriteAnimal = other.favoriteAnimal;
     }
     return *this;
 }
@@ -42,7 +45,13 @@ Visitors::~Visitors() {
 }
 
 void Visitors::display() const {
-    cout << "Name: " << name << ", Age: " << age << ", Ticket: " << ticket << endl;
+    std::cout << "[" << getRole() << "] ";
+    Person::display();
+    std::cout << "Age: " << age << ", Ticket ID: " << ticket << std::endl;
+    if (favoriteAnimal) {
+        std::cout << "Favorite Animal species: ";
+        favoriteAnimal->display();
+    }
 }
 
 void Visitors::setAge(int age) {
@@ -54,24 +63,29 @@ int Visitors::getCount() {
 }
 
 Visitors Visitors::operator+(const Visitors& other) {
-    return Visitors(this->name + " + " + other.name, this->age + other.age, this->ticket + other.ticket);
+    return Visitors("Group", this->age, this->ticket + other.ticket);
 }
 
-ostream& operator<<(ostream& os, const Visitors& v) {
-    os << v.name << " " << v.age << " " << v.ticket;
+std::ostream& operator<<(std::ostream& os, const Visitors& v) {
+    os << "Visitor: " << v.name << " (Ticket: " << v.ticket << ")";
     return os;
 }
 
-istream& operator>>(istream& is, Visitors& v) {
-    is >> v.name >> v.age >> v.ticket;
+std::istream& operator>>(std::istream& is, Visitors& v) {
+    std::cout << "Enter visitor name: ";
+    is >> v.name;
+    std::cout << "Enter age: ";
+    is >> v.age;
+    std::cout << "Enter ticket number: ";
+    is >> v.ticket;
     return is;
 }
 
-VIPVisitor::VIPVisitor(string name, int age, int ticket, string lounge)
-    : Visitors(name, age, ticket), loungeAccess(lounge) {
+VIPVisitor::VIPVisitor(std::string name, int age, int ticket, std::string lounge, Animals* fav)
+    : Visitors(name, age, ticket, fav), loungeAccess(lounge) {
 }
 
 void VIPVisitor::display() const {
     Visitors::display();
-    cout << "Lounge Access: " << loungeAccess << endl;
+    std::cout << "Lounge Access: " << loungeAccess << std::endl;
 }
