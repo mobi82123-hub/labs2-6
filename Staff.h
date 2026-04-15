@@ -1,9 +1,11 @@
 #ifndef STAFF_H
 #define STAFF_H
+
 #include <string>
 #include <iostream>
+#include <vector>
 
-class IPrintable {  // Інтерфейс
+class IPrintable {
 public:
     virtual void printStatus() const = 0;
     virtual ~IPrintable() {}
@@ -36,6 +38,10 @@ public:
     std::string getRole() const override { return "Staff Member"; }
     void info() const { std::cout << "Static Binding: Staff Info" << std::endl; }
 
+    std::string getName() const { return name; }
+    std::string getPosition() const { return position; }
+    int getAge() const { return age; }
+
     friend std::ostream& operator<<(std::ostream& os, const Staff& s);
     friend std::istream& operator>>(std::istream& is, Staff& s);
 };
@@ -48,4 +54,14 @@ public:
     void display() const override final;
     std::string getRole() const override { return "Manager"; }
 };
+
+//  FILE FUNCTIONS 
+
+void saveStaffToFile(const Staff& s);
+std::vector<std::string> loadStaffFromFile();
+void showAllStaff();
+
+// видалення
+void deleteStaffById(int id);
+
 #endif
