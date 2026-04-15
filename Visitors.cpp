@@ -1,4 +1,7 @@
 #include "Visitors.h"
+#include <fstream>
+#include <vector>
+#include <cstdio>
 
 int Visitors::visitorCount = 0;
 
@@ -49,7 +52,7 @@ void Visitors::display() const {
     Person::display();
     std::cout << "Age: " << age << ", Ticket ID: " << ticket << std::endl;
     if (favoriteAnimal) {
-        std::cout << "Favorite Animal species: ";
+        std::cout << "Favorite Animal: ";
         favoriteAnimal->display();
     }
 }
@@ -67,7 +70,7 @@ Visitors Visitors::operator+(const Visitors& other) {
 }
 
 std::ostream& operator<<(std::ostream& os, const Visitors& v) {
-    os << "Visitor: " << v.name << " (Ticket: " << v.ticket << ")";
+    os << "Visitor: " << v.name << " " << v.age << " " << v.ticket;
     return os;
 }
 
@@ -81,6 +84,8 @@ std::istream& operator>>(std::istream& is, Visitors& v) {
     return is;
 }
 
+//  VIP 
+
 VIPVisitor::VIPVisitor(std::string name, int age, int ticket, std::string lounge, Animals* fav)
     : Visitors(name, age, ticket, fav), loungeAccess(lounge) {
 }
@@ -88,4 +93,87 @@ VIPVisitor::VIPVisitor(std::string name, int age, int ticket, std::string lounge
 void VIPVisitor::display() const {
     Visitors::display();
     std::cout << "Lounge Access: " << loungeAccess << std::endl;
+}
+
+//  FILE LOGIC
+
+void saveVisitorToFile(const Visitors& v) {
+    std::ofstream file("visitors.txt", std::ios::app);
+    if (!file) return;
+
+    file << v.getName() << " "
+        << v.getAgeValue() << " "
+        << v.getTicket() << std::endl;
+}
+
+std::vector<std::string> loadVisitorsFromFile() {
+    std::vector<std::string> data;
+    std::ifstream file("visitors.txt");
+
+    std::string line;
+    while (std::getline(file, line)) {
+        data.push_back(line);
+    }
+
+    return data;
+}
+
+//  ВИВІД З ID
+void showAllVisitors() {
+    auto data = loadVisitorsFromFile();
+
+    if (data.empty()) {
+        std::cout << "No visitors found" << std::endl;
+        return;
+    }
+
+    int id = 1;
+    for (const auto& v : data) {
+        std::cout << id++ << ". " << v << std::endl;
+    }
+}
+
+//  ВИДАЛЕННЯ
+void deleteVisitorById(int id) {
+    std::ifstream file("visitors.txt");
+    std::ofstream temp("temp.txt");
+
+    if (!file || !temp) {
+        std::cout << "File error\n";
+        return;
+    }
+
+    std::string line;
+    int currentId = 1;
+    bool found = false;
+
+    while (std::getline(file, line)) {
+        if (currentId != id) {
+            temp << line << std::endl;
+        }
+        else {
+            found = true;
+        }
+        currentId++;
+    }
+
+    file.close();
+    temp.close();
+
+    remove("visitors.txt");
+    rename("temp.txt", "visitors.txt");
+
+    if (found)
+        std::cout << "Visitor deleted successfully!\n";
+    else
+        std::cout << "ID not found\n";
+}
+
+//  LOG 
+
+void logAction(const std::string& action) {
+    std::ofstream file("history.txt", std::ios::app);
+    if (!file) return;
+
+    file << action << std::endl;
 }
