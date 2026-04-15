@@ -1,6 +1,9 @@
 #ifndef ANIMALS_H
 #define ANIMALS_H
+
 #include <string>
+#include <iostream>
+#include <vector>
 #include "Staff.h"
 
 class Animals : public IPrintable {
@@ -26,6 +29,9 @@ public:
     virtual std::string getSound() const = 0;
 
     void printStatus() const override { std::cout << "Animal status: Healthy" << std::endl; }
+
+    std::string getSpecies() const { return species; }
+    int getAge() const { return age; }
 };
 
 class Mammal final : public Animals {
@@ -36,6 +42,15 @@ public:
     void display() const override;
 
     std::string getSound() const override { return "Mammal sound"; }
+
+    std::string getFurColor() const { return furColor; }
 };
+
+void saveAnimalToFile(const Animals* animal);
+std::vector<std::string> loadAnimalsFromFile();
+void showAllAnimals();
+
+// видалення
+void deleteAnimalById(int id);
 
 #endif
